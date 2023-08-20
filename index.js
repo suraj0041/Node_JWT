@@ -13,7 +13,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(
   cors({
-    origin: "https://4l9l3x.csb.app",
+    origin: "https://gkd2h6.csb.app",
   })
 );
 //create a server object:
@@ -34,24 +34,16 @@ app.get("/", (req, res) => {
   console.log("hello from Suraj:");
   res.json({ data: "hello from Suraj" + JSON.stringify(UserData) });
 });
-//----------------------------------------------------
-app.get("/post", authenticateToken, (req, res) => {
-  res.json(posts.filter((post) => post.username === req.user.name));
-  res.json("hello from post");
-});
+
 //----------------------------------------------------
 app.post("/login", (req, res) => {
   let jwt_token = null;
-  //console.log("login:" + req.body.username);
-  //res.json("hello from login:" + req.body.username);
-  //const username = "suraj"; //res.body.username;
   let FoundUser = UserData.filter(
     (u) =>
       u.username === req.body?.username && u.password === req.body?.password
   );
   if (FoundUser?.length > 0) {
     const { username, password, role } = FoundUser[0];
-    console.log(username, password);
     jwt_token = jwt.sign(username, process.env.ACCESS_TOKEN_SECRET);
     res.json({
       username: username,
@@ -61,8 +53,14 @@ app.post("/login", (req, res) => {
     });
   } else {
     res.sendStatus(403);
-    //res.json(`${req.body.username} user not found`);
   }
+});
+//----------------------------------------------------
+app.post("/verify", authenticateToken, (req, res) => {
+  let user = UserData.filter((u) => u.username === req.username);
+  //console.log(user);
+  res.json(user);
+  //res.json("hello from post");
 });
 //----------------------------------------------------
 function authenticateToken(req, res, next) {
@@ -72,7 +70,8 @@ function authenticateToken(req, res, next) {
 
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
     if (err) return res.sendStatus(401);
-    req.user = user;
+    //console.log(`verify:${user}`);
+    req.username = user;
     next();
   });
 }
