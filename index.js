@@ -44,7 +44,7 @@ app.post("/login", (req, res) => {
   );
   if (FoundUser?.length > 0) {
     const { username, password, role } = FoundUser[0];
-    jwt_token = jwt.sign(username, process.env.ACCESS_TOKEN_SECRET);
+    jwt_token = jwt.sign(username, process.env.ACCESS_TOKEN_SECRET,{expiresIn:'15s'});
     res.json({
       username: username,
       password: password,
